@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+    
+    <linearGradient id="score-A" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#038754"/><stop offset="100%" stop-color="#026941"/></linearGradient>
+    <linearGradient id="score-B" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#85BB2F"/><stop offset="100%" stop-color="#6B9624"/></linearGradient>
+    <linearGradient id="score-C" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#F9B300"/><stop offset="100%" stop-color="#D19600"/></linearGradient>
+    <linearGradient id="score-D" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#EE7002"/><stop offset="100%" stop-color="#C65D01"/></linearGradient>
+    <linearGradient id="score-E" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E63E11"/><stop offset="100%" stop-color="#B8300C"/></linearGradient>
+
+    <filter id="glow-A" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="8" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
+    <filter id="glow-E" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="12" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
+  </defs>
+
+  <rect width="1200" height="400" rx="15" fill="url(#bg)"/>
+  
+  <path d="M0 100 H1200 M0 200 H1200 M0 300 H1200 M200 0 V400 M400 0 V400 M600 0 V400 M800 0 V400 M1000 0 V400" stroke="#334155" stroke-width="0.5" stroke-dasharray="5,5" opacity="0.3"/>
+
+  <g transform="translate(80, 50)">
+    <rect x="0" y="40" width="130" height="240" rx="20" fill="none" stroke="#475569" stroke-width="4"/>
+    <rect x="10" y="60" width="110" height="190" rx="10" fill="#1e293b"/>
+    <g transform="translate(30, 110)" stroke="#38bdf8" stroke-width="3">
+      <line x1="5" y1="0" x2="5" y2="50"/>
+      <line x1="15" y1="0" x2="15" y2="50" stroke-width="1"/>
+      <line x1="25" y1="0" x2="25" y2="50" stroke-width="5"/>
+      <line x1="40" y1="0" x2="40" y2="50"/>
+      <line x1="50" y1="0" x2="50" y2="50" stroke-width="2"/>
+      <line x1="65" y1="0" x2="65" y2="50" stroke-width="4"/>
+    </g>
+    <text x="65" y="190" fill="#38bdf8" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" text-anchor="middle" letter-spacing="2">SCANNING EAN...</text>
+
+    <g stroke="#818cf8" stroke-width="3" fill="none" opacity="0.8">
+      <path d="M 170,140 A 40,40 0 0,1 170,180" stroke-dasharray="2,2"/>
+      <path d="M 190,120 A 60,60 0 0,1 190,200"/>
+      <path d="M 210,100 A 80,80 0 0,1 210,220"/>
+    </g>
+    <path d="M 185,150 L 195,160 L 190,165 L 190,145 L 195,150 L 185,160" stroke="#818cf8" stroke-width="2" fill="none" transform="scale(1.5) translate(-115, -53)"/>
+
+    <g transform="translate(260, 100)">
+      <rect x="0" y="0" width="120" height="120" rx="15" fill="#334155" stroke="#64748b" stroke-width="3"/>
+      <circle cx="60" cy="60" r="25" fill="#ff4d4d" filter="url(#glow-E)"/>
+      <circle cx="60" cy="60" r="12" fill="#ffffff" opacity="0.9"/>
+      <text x="60" y="110" fill="#94a3b8" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" text-anchor="middle" font-weight="bold">IoT DEVICE</text>
+    </g>
+  </g>
+
+  <g transform="translate(540, 90)">
+    <text x="0" y="40" fill="#ffffff" font-family="'Segoe UI', Roboto, sans-serif" font-size="46" font-weight="900" letter-spacing="1">NutriAlert <tspan fill="#38bdf8">BLE</tspan></text>
+    
+    <text x="0" y="80" fill="#94a3b8" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="500">Smart Nutri-Score Warning System</text>
+    
+    <g transform="translate(0, 120)">
+      <rect x="0" y="0" width="120" height="28" rx="6" fill="#1e293b" stroke="#334155"/>
+      <text x="60" y="18" fill="#a7f3d0" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="bold" text-anchor="middle">EAN Scanner</text>
+
+      <rect x="130" y="0" width="140" height="28" rx="6" fill="#1e293b" stroke="#334155"/>
+      <text x="200" y="18" fill="#c7d2fe" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="bold" text-anchor="middle">Bluetooth LE (v5.x)</text>
+
+      <rect x="280" y="0" width="120" height="28" rx="6" fill="#1e293b" stroke="#334155"/>
+      <text x="340" y="18" fill="#fef08a" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="bold" text-anchor="middle">RGB LED Alert</text>
+    </g>
+
+    <text x="0" y="195" fill="#64748b" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-style="italic">
+      Algorithm calibrated based on WHO IARC Evidence Summary (Brief No. 2)
+    </text>
+
+    <g transform="translate(0, 220)">
+      <rect x="0" y="0" width="55" height="35" rx="4" fill="url(#score-A)"/>
+      <text x="27.5" y="24" fill="#ffffff" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="bold" text-anchor="middle">A</text>
+      <rect x="60" y="0" width="55" height="35" rx="4" fill="url(#score-B)" opacity="0.4"/>
+      <text x="87.5" y="24" fill="#ffffff" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" opacity="0.5">B</text>
+      <rect x="120" y="0" width="55" height="35" rx="4" fill="url(#score-C)" opacity="0.4"/>
+      <text x="147.5" y="24" fill="#ffffff" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" opacity="0.5">C</text>
+      <rect x="180" y="0" width="55" height="35" rx="4" fill="url(#score-D)" opacity="0.4"/>
+      <text x="207.5" y="24" fill="#ffffff" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" opacity="0.5">D</text>
+      <rect x="240" y="0" width="55" height="35" rx="4" fill="url(#score-E)" stroke="#ffffff" stroke-width="2" filter="url(#glow-A)"/>
+      <text x="267.5" y="24" fill="#ffffff" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="bold" text-anchor="middle">E</text>
+    </g>
+  </g>
+</svg>
