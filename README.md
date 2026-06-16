@@ -36,23 +36,27 @@ The physical device instantly illuminates an onboard **RGB LED array** matching 
 ---
 
 ## 🔄 System Architecture & Data Flow
-[ Food Product ]
-│
-│ (Reads EAN Barcode)
-▼
-📱 [ Mobile App ] ──────────────┐
-│                         │ (Queries database &
-│ (Calculates Score)      │  validates metrics)
-▼                         ▼
-[ Nutri-Score Index ]      [ BLE Data Packet ]
-│
-│ (Wireless Broadcast)
-▼
-🎛️ [ IoT Node ]
-│
-▼
-🚨 [ RGB LED Visual Glow ]
-(A 🟩 ──► C 🟨 ──► E 🟥)
+## 🔄 System Architecture & Data Flow
+
+```text
+   [ Food Product ] 
+          │ 
+          │ (Reads EAN Barcode)
+          ▼
+    📱 [ Mobile App ] ──────────────┐
+          │                         │ (Queries database &
+          │ (Calculates Score)      │  validates metrics)
+          ▼                         ▼
+   [ Nutri-Score Index ]      [ BLE Data Packet ]
+                                    │
+                                    │ (Wireless Broadcast)
+                                    ▼
+                             🎛️ [ IoT Node ]
+                                    │
+                                    ▼
+                       🚨 [ RGB LED Visual Glow ]
+                           (A 🟩 ──► C 🟨 ──► E 🟥)
+```
 1. **Capture:** The smartphone camera captures the product's **EAN Barcode**.
 2. **Compute:** The mobile application processes the code, matches it against an indexed nutritional database, and extracts the nutrient profiling index.
 3. **Transmit:** The target letter score (A, B, C, D, or E) is compressed into a light characteristic data packet and beamed across **BLE**.
