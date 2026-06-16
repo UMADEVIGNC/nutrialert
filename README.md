@@ -34,8 +34,6 @@ The physical device instantly illuminates an onboard **RGB LED array** matching 
 * **Robust Local Cache:** Speeds up response times for frequently scanned items, limiting unnecessary API latency and keeping the hardware responsive.
 
 ---
-
-## 🔄 System Architecture & Data Flow
 ## 🔄 System Architecture & Data Flow
 
 ```text
