@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>Nutri-Score · EAN + Manual Calculator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+        body {
+            background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+            min-height: 100vh;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card {
+            max-width: 720px;
+            width: 100%;
+            background: #f8fafc;
+            border-radius: 40px;
+            padding: 24px 20px 30px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6);
+        }
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .sub {
+            color: #475569;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            border-left: 4px solid #3b82f6;
+            padding-left: 14px;
+            background: #e2e8f0;
+            border-radius: 0 12px 12px 0;
+            line-height: 1.4;
+        }
+        .status-grid {
+            background: #eef2f6;
+            border-radius: 28px;
+            padding: 12px 18px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            gap: 8px 12px;
+        }
+        .status-item { display: flex; align-items: baseline; gap: 6px; font-size: 0.9rem; }
+        .status-label { font-weight: 500; color: #334155; }
+        .status-value { font-weight: 600; color: #0f172a; }
+        .connected { color: #16a34a; }
+        .disconnected { color: #dc2626; }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        button {
+            border: none;
+            background: white;
+            padding: 12px 18px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            transition: all 0.15s;
+            cursor: pointer;
+            flex: 1 1 auto;
+            border: 1px solid #d1d9e6;
+            color: #1e293b;
+        }
+        button:active { transform: scale(0.96); }
+        .btn-primary { background: #2563eb; border-color: #2563eb; color: white; box-shadow: 0 8px 18px -6px #2563eb80; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-danger { background: #dc2626; border-color: #dc2626; color: white; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-secondary { background: #475569; border-color: #475569; color: white; }
+        .btn-secondary:hover { background: #334155; }
+        .btn-green { background: #16a34a; border-color: #16a34a; color: white; }
+        .btn-green:hover { background: #15803d; }
+        .scanner-box {
+            background: #0b1120;
+            border-radius: 28px;
+            overflow: hidden;
+            margin: 16px 0 10px;
+            position: relative;
+            box-shadow: inset 0 0 0 1px #334155;
+        }
+        #reader { width: 100%; min-height: 340px; background: #0f172a; }
+        .manual-area {
+            margin: 18px 0 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        .manual-area input {
+            flex: 2 1 180px;
+            padding: 14px 16px;
+            border-radius: 60px;
+            border: 1.5px solid #cbd5e1;
+            background: white;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.2s;
+        }
+        .manual-area input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px #2563eb30; }
+        .manual-area button { flex: 0 1 auto; padding: 14px 28px; background: #2563eb; border: none; color: white; border-radius: 60px; font-weight: 600; }
+        .result-panel {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 18px 20px;
+            margin: 20px 0 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border: 1px solid #e2e8f0;
+        }
+        .row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+        .barcode-display {
+            font-family: 'Courier New', monospace;
+            background: #f1f5f9;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            word-break: break-all;
+        }
+        .led-cluster { display: flex; gap: 16px; justify-content: center; margin: 10px 0 6px; }
+        .led {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: #cbd5e1;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            border: 2px solid #f1f5f9;
+        }
+        .led-red.active { background: #ef4444; box-shadow: 0 0 20px #ef4444aa; }
+        .led-green.active { background: #22c55e; box-shadow: 0 0 20px #22c55eaa; }
+        .led-blue.active { background: #3b82f6; box-shadow: 0 0 20px #3b82f6aa; }
+        .nutri-result { font-weight: 500; font-size: 1.05rem; padding: 10px 0 4px; color: #0f172a; }
+        .log {
+            background: #e9edf2;
+            border-radius: 20px;
+            padding: 12px 14px;
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+            font-family: 'SF Mono', monospace;
+            margin-top: 14px;
+            border: 1px solid #d1d9e6;
+            color: #1e293b;
+        }
+        .log-entry { padding: 4px 0; border-bottom: 1px solid #cbd5e1; display: flex; gap: 8px; }
+        .log-entry.error { color: #b91c1c; }
+        .log-entry.success { color: #15803d; }
+        .footnote {
+            background: #fef9c3;
+            border-radius: 40px;
+            padding: 12px 18px;
+            font-size: 0.85rem;
+            color: #854d0e;
+            margin-top: 18px;
+            border: 1px solid #facc15;
+        }
+        /* manual calculator overlay */
+        .calc-box {
+            background: #f1f5f9;
+            border-radius: 28px;
+            padding: 16px 18px;
+            margin-top: 16px;
+            border: 2px dashed #64748b;
+            display: none;
+            transition: 0.3s;
+        }
+        .calc-box.visible { display: block; }
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 18px;
+            margin: 12px 0;
+        }
+        .calc-grid label {
+            font-weight: 500;
+            color: #1e293b;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 0.9rem;
+        }
+        .calc-grid input {
+            padding: 10px 12px;
+            border-radius: 40px;
+            border: 1.5px solid #cbd5e1;
+            background: white;
+            font-size: 0.95rem;
+            width: 100%;
+        }
+        .calc-grid input:focus { border-color: #2563eb; outline: none; }
+        .calc-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .calc-actions button { flex: 1; }
+        .grade-badge {
+            display: inline-block;
+            padding: 4px 16px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            background: #e2e8f0;
+        }
+        @media (max-width: 460px) { .card { padding: 16px; } h1 { font-size: 1.5rem; } .calc-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>📡 Nutri·Scan</h1>
+    <div class="sub">EAN → Nutri-Score · RGB LED (BLE) · manual fallback</div>
+
+    <div class="status-grid">
+        <span class="status-item"><span class="status-label">BLE</span> <span id="bleStatus" class="status-value disconnected">⛔ Disconnected</span></span>
+        <span class="status-item"><span class="status-label">Device</span> <span id="deviceName" class="status-value">—</span></span>
+    </div>
+
+    <div class="btn-group">
+        <button id="connectBtn" class="btn-primary">🔗 Connect</button>
+        <button id="disconnectBtn" class="btn-danger" disabled>⛔ Disconnect</button>
+    </div>
+
+    <div class="scanner-box"><div id="reader"></div></div>
+
+    <div class="manual-area">
+        <input type="text" id="manualBarcode" placeholder="Enter EAN (e.g. 5901234123457)" inputmode="numeric">
+        <button id="manualSendBtn">📤 Send</button>
+    </div>
+
+    <!-- MANUAL CALCULATOR (hidden by default) -->
+    <div id="manualCalc" class="calc-box">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span style="font-weight:700; font-size:1.1rem;">🧮 Manual Nutri-Score</span>
+            <span style="background:#dbeafe; padding:2px 14px; border-radius:40px; font-size:0.8rem;">per 100g</span>
+        </div>
+        <div class="calc-grid">
+            <label>Energy (kcal) <input type="number" id="calEnergy" value="0" step="0.1" min="0"></label>
+            <label>Sugars (g) <input type="number" id="calSugar" value="0" step="0.1" min="0"></label>
+            <label>Saturated fat (g) <input type="number" id="calSatFat" value="0" step="0.1" min="0"></label>
+            <label>Sodium (mg) <input type="number" id="calSodium" value="0" step="0.1" min="0"></label>
+        </div>
+        <div class="calc-actions">
+            <button id="calcGradeBtn" class="btn-green">⭐ Calculate Grade</button>
+            <button id="calcSendRGB" class="btn-secondary">📤 Send RGB to Arduino</button>
+        </div>
+        <div id="calcResult" style="margin-top:10px; font-weight:500; background:white; padding:10px 16px; border-radius:60px;">Grade: —</div>
+    </div>
+
+    <div class="result-panel">
+        <div class="row">
+            <span style="font-weight:600;">📦 Last EAN</span>
+            <span id="lastBarcode" class="barcode-display">—</span>
+        </div>
+        <div class="led-cluster">
+            <div class="led led-red" id="ledRed"></div>
+            <div class="led led-green" id="ledGreen"></div>
+            <div class="led led-blue" id="ledBlue"></div>
+        </div>
+        <div class="nutri-result" id="nutriScoreResult">⭐ Nutri-Score: wait for scan</div>
+    </div>
+
+    <div class="log" id="log"><div class="log-entry">📌 ready · scan or type EAN</div></div>
+    <div class="footnote">
+        ⚡ If product not found, <strong>manual calculator appears</strong> — enter nutrients (per 100g) to compute grade.
+        <span style="display:inline-block; background:#e2e8f0; padding:2px 12px; border-radius:40px; margin-top:4px;">Formula: points (energy, sugar, sat fat, sodium) → A (0-1) · B (2-3) · C (4-6) · D (7-9) · E (10+)</span>
+    </div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+    (function() {
+        // ----- DOM refs -----
+        const bleStatus = document.getElementById('bleStatus');
+        const deviceName = document.getElementById('deviceName');
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const manualInput = document.getElementById('manualBarcode');
+        const manualSend = document.getElementById('manualSendBtn');
+        const lastBarcode = document.getElementById('lastBarcode');
+        const nutriResult = document.getElementById('nutriScoreResult');
+        const logDiv = document.getElementById('log');
+        const ledRed = document.getElementById('ledRed');
+        const ledGreen = document.getElementById('ledGreen');
+        const ledBlue = document.getElementById('ledBlue');
+
+        // manual calc elements
+        const calcBox = document.getElementById('manualCalc');
+        const calEnergy = document.getElementById('calEnergy');
+        const calSugar = document.getElementById('calSugar');
+        const calSatFat = document.getElementById('calSatFat');
+        const calSodium = document.getElementById('calSodium');
+        const calcGradeBtn = document.getElementById('calcGradeBtn');
+        const calcSendRGB = document.getElementById('calcSendRGB');
+        const calcResult = document.getElementById('calcResult');
+
+        // ----- BLE state -----
+        let bleDevice = null;
+        let bleCharacteristic = null;
+        const SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
+        const CHAR_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
+
+        // ----- logging -----
+        function addLog(msg, type='info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `${new Date().toLocaleTimeString()} · ${msg}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(msg);
+        }
+
+        // ----- LED preview -----
+        function updateLEDPreview(r,g,b) {
+            ledRed.classList.toggle('active', r>0);
+            ledGreen.classList.toggle('active', g>0);
+            ledBlue.classList.toggle('active', b>0);
+        }
+
+        // ----- send RGB to Arduino -----
+        async function sendToArduino(r,g,b) {
+            if (!bleCharacteristic) {
+                addLog("❌ Not connected to Arduino", 'error');
+                return false;
+            }
+            try {
+                const payload = `${Math.round(r)},${Math.round(g)},${Math.round(b)}`;
+                await bleCharacteristic.writeValue(new TextEncoder().encode(payload));
+                addLog(`📤 sent RGB: ${payload}`, 'success');
+                return true;
+            } catch(e) {
+                addLog(`⚠️ send failed: ${e.message}`, 'error');
+                return false;
+            }
+        }
+
+        // ----- Nutri-Score computation (core) -----
+        function computeNutriScorePoints(energy, sugar, satFat, sodium) {
+            let points = 0;
+            if (energy > 335) points += (energy > 670) ? 2 : 1;
+            if (sugar > 4.5) points += (sugar > 9) ? 2 : 1;
+            if (satFat > 1.5) points += (satFat > 3) ? 2 : 1;
+            if (sodium > 90) points += (sodium > 180) ? 2 : 1;
+            return Math.min(points, 10);
+        }
+        function gradeFromPoints(points) {
+            if (points <= 1) return 'A';
+            if (points <= 3) return 'B';
+            if (points <= 6) return 'C';
+            if (points <= 9) return 'D';
+            return 'E';
+        }
+
+        // ----- show manual calculator (triggered when product not found) -----
+        function showManualCalculator(optionalBarcode) {
+            calcBox.classList.add('visible');
+            if (optionalBarcode) {
+                lastBarcode.textContent = optionalBarcode.replace(/\D/g, '');
+            }
+            // prefill with zeros
+            calEnergy.value = 0;
+            calSugar.value = 0;
+            calSatFat.value = 0;
+            calSodium.value = 0;
+            calcResult.innerHTML = 'Grade: — (enter nutrients)';
+            addLog('📝 manual calculator opened', 'info');
+        }
+
+        // ----- hide manual calculator -----
+        function hideManualCalculator() {
+            calcBox.classList.remove('visible');
+        }
+
+        // ----- calculate from manual inputs -----
+        function calculateManualGrade() {
+            const energy = parseFloat(calEnergy.value) || 0;
+            const sugar = parseFloat(calSugar.value) || 0;
+            const satFat = parseFloat(calSatFat.value) || 0;
+            const sodium = parseFloat(calSodium.value) || 0;
+            const pts = computeNutriScorePoints(energy, sugar, satFat, sodium);
+            const grade = gradeFromPoints(pts);
+            calcResult.innerHTML = `⭐ Grade: <span class="grade-badge" style="background:${grade==='A'?'#bbf7d0':grade==='E'?'#fecaca':'#fef08a'}">${grade}</span> (points: ${pts})`;
+            addLog(`🧮 manual calc → ${grade} (${pts} pts)`, 'success');
+            // update LED based on grade
+            if (grade === 'A') {
+                sendToArduino(0, 255, 0);
+                updateLEDPreview(0,255,0);
+                nutriResult.innerHTML = `🧮 Manual: Grade A → GREEN`;
+            } else {
+                sendToArduino(255, 0, 0);
+                updateLEDPreview(255,0,0);
+                nutriResult.innerHTML = `🧮 Manual: Grade ${grade} → RED`;
+            }
+            return grade;
+        }
+
+        // ----- API lookup + fallback to manual -----
+        async function queryNutriScore(barcode) {
+            const clean = barcode.replace(/\D/g, '');
+            if (clean.length < 8) {
+                nutriResult.innerHTML = '❌ Invalid EAN (too short)';
+                addLog(`invalid EAN: ${clean}`, 'error');
+                return false;
+            }
+            lastBarcode.textContent = clean;
+            addLog(`🔎 querying: ${clean}`);
+
+            try {
+                const url = `https://world.openfoodfacts.net/api/v2/product/${clean}?fields=product_name,nutriscore_data,nutriments`;
+                const resp = await fetch(url);
+                const data = await resp.json();
+
+                if (data.status === 1 && data.product) {
+                    const product = data.product;
+                    let grade = null;
+                    let productName = product.product_name || 'Unknown';
+                    let pts = null;
+
+                    if (product.nutriscore_data && product.nutriscore_data.grade) {
+                        grade = product.nutriscore_data.grade.toUpperCase();
+                    } else if (product.nutriments) {
+                        const n = product.nutriments;
+                        const energy = n['energy-kcal'] || n['energy'] || 0;
+                        const sugar = n.sugars || 0;
+                        const satFat = n['saturated-fat'] || 0;
+                        const sodium = n.sodium || 0;
+                        pts = computeNutriScorePoints(energy, sugar, satFat, sodium);
+                        grade = gradeFromPoints(pts);
+                        addLog(`⚙️ computed fallback: ${grade} (${pts} pts)`, 'info');
+                    } else {
+                        // no nutriscore data -> show manual calculator
+                        addLog(`⚠️ no Nutri-Score data for ${clean}`, 'error');
+                        nutriResult.innerHTML = `❌ No Nutri-Score data.<br>📝 Please use manual calculator below.`;
+                        showManualCalculator(clean);
+                        await sendToArduino(255, 255, 0);
+                        updateLEDPreview(255,255,0);
+                        return false;
+                    }
+
+                    // display result
+                    let msg = `🍎 ${productName}<br>⭐ Nutri-Score: <strong>${grade}</strong>`;
+                    if (grade === 'A') {
+                        msg += ' ✅ → GREEN';
+                        await sendToArduino(0, 255, 0);
+                        updateLEDPreview(0,255,0);
+                    } else {
+                        msg += ` ⚠️ → RED`;
+                        await sendToArduino(255, 0, 0);
+                        updateLEDPreview(255,0,0);
+                    }
+                    nutriResult.innerHTML = msg;
+                    addLog(`✅ ${productName} · Nutri-Score ${grade}`, 'success');
+                    hideManualCalculator();
+                    return true;
+                } else {
+                    // product not found -> show manual calculator
+                    addLog(`❌ product not found: ${clean}`, 'error');
+                    nutriResult.innerHTML = `❌ Product not found.<br>📝 Please use manual calculator below.`;
+                    showManualCalculator(clean);
+                    await sendToArduino(255, 255, 0);
+                    updateLEDPreview(255,255,0);
+                    return false;
+                }
+            } catch (err) {
+                addLog(`⚠️ API error: ${err.message}`, 'error');
+                nutriResult.innerHTML = `⚠️ Network error · try manual calculator`;
+                showManualCalculator(clean);
+                return false;
+            }
+        }
+
+        // ----- process barcode (entry) -----
+        async function processBarcode(raw) {
+            const clean = raw.replace(/\D/g, '');
+            if (clean.length < 8) {
+                addLog(`invalid barcode: ${raw}`, 'error');
+                nutriResult.innerHTML = '❌ Invalid EAN code';
+                return;
+            }
+            await queryNutriScore(clean);
+        }
+
+        // ----- BLE connect / disconnect -----
+        async function connectBLE() {
+            try {
+                if (!navigator.bluetooth) { alert('Web Bluetooth not supported.'); return; }
+                addLog('🔍 requesting device...');
+                bleDevice = await navigator.bluetooth.requestDevice({
+                    filters: [{ name: 'Leadership' }],
+                    optionalServices: [SERVICE_UUID]
+                });
+                addLog(`✅ ${bleDevice.name} found`);
+                deviceName.textContent = bleDevice.name;
+                const server = await bleDevice.gatt.connect();
+                const service = await server.getPrimaryService(SERVICE_UUID);
+                bleCharacteristic = await service.getCharacteristic(CHAR_UUID);
+                bleStatus.className = 'status-value connected';
+                bleStatus.textContent = '✅ Connected';
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                addLog('🔗 BLE ready', 'success');
+                await sendToArduino(0,0,255);
+                setTimeout(() => sendToArduino(0,0,0), 400);
+            } catch(e) {
+                addLog(`❌ BLE error: ${e.message}`, 'error');
+                bleDevice = null; bleCharacteristic = null;
+            }
+        }
+        async function disconnectBLE() {
+            if (bleDevice && bleDevice.gatt.connected) await bleDevice.gatt.disconnect();
+            bleDevice = null; bleCharacteristic = null;
+            bleStatus.className = 'status-value disconnected';
+            bleStatus.textContent = '⛔ Disconnected';
+            deviceName.textContent = '—';
+            connectBtn.disabled = false;
+            disconnectBtn.disabled = true;
+            updateLEDPreview(0,0,0);
+            addLog('🔌 disconnected');
+        }
+
+        // ----- scanner init -----
+        let html5QrCode = null;
+        function initScanner() {
+            if (typeof Html5Qrcode === 'undefined') { addLog('⚠️ Scanner library not loaded', 'error'); return; }
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 12, qrbox: { width: 240, height: 240 }, aspectRatio: 1.0, showTorchButtonIfSupported: true },
+                (decoded) => { addLog(`📸 scanned: ${decoded}`); processBarcode(decoded); },
+                () => {}
+            ).catch(err => addLog(`⚠️ scanner: ${err}`, 'error'));
+        }
+
+        // ----- event listeners -----
+        manualSend.addEventListener('click', () => {
+            const val = manualInput.value.trim();
+            if (val) { processBarcode(val); manualInput.value = ''; }
+            else addLog('enter an EAN code', 'error');
+        });
+        manualInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') manualSend.click(); });
+
+        connectBtn.addEventListener('click', connectBLE);
+        disconnectBtn.addEventListener('click', disconnectBLE);
+
+        // manual calculator events
+        calcGradeBtn.addEventListener('click', () => {
+            calculateManualGrade();
+        });
+        calcSendRGB.addEventListener('click', async () => {
+            const grade = calculateManualGrade();
+            // already sent in calculateManualGrade, but we can force resend
+            if (grade === 'A') {
+                await sendToArduino(0,255,0);
+                updateLEDPreview(0,255,0);
+            } else {
+                await sendToArduino(255,0,0);
+                updateLEDPreview(255,0,0);
+            }
+            addLog(`📤 manual RGB sent for grade ${grade}`, 'success');
+        });
+
+        // close manual calc if user scans a product successfully (hide)
+        // but we keep it visible if they want to use it manually.
+
+        window.addEventListener('beforeunload', () => {
+            if (html5QrCode && html5QrCode.isScanning) html5QrCode.stop().catch(()=>{});
+            if (bleDevice && bleDevice.gatt.connected) disconnectBLE();
+        });
+
+        // start
+        initScanner();
+        addLog('📷 ready · scan EAN or type. If not found → manual calculator appears', 'success');
+    })();
+</script>
+</body>
+</html>
