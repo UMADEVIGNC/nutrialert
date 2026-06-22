@@ -504,7 +504,7 @@
                 if (!navigator.bluetooth) { alert('Web Bluetooth not supported.'); return; }
                 addLog('🔍 requesting device...');
                 bleDevice = await navigator.bluetooth.requestDevice({
-                    filters: [{ name: 'Leadership' }],
+                    filters: [{ name: 'Nutriscore' }],
                     optionalServices: [SERVICE_UUID]
                 });
                 addLog(`✅ ${bleDevice.name} found`);
