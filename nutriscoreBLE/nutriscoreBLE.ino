@@ -73,7 +73,7 @@ void setup() {
   analogWrite(BLUE_LED_PIN, 0);
 
   // Initialize BLE
-  BLEDevice::init("Leadership");
+  BLEDevice::init("Nutriscore");
   pServer = BLEDevice::createServer();
 
   BLEService *pService = pServer->createService(SERVICE_UUID);
